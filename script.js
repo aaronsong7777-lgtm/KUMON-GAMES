@@ -1,46 +1,15 @@
-var heading = document.querySelector('h1');
-var year = document.querySelector('#year');
-var navLinks = document.querySelectorAll('.site-nav a');
-var sections = document.querySelectorAll('main section[id]');
-var skillButtons = document.querySelectorAll('.skill-list button');
-
-heading.addEventListener('mouseenter', function () {
-    this.style.color = '#ff6b6b';
-});
-
-heading.addEventListener('mouseout', function () {
-    this.style.color = '';
-});
-
-year.textContent = new Date().getFullYear();
-
-document.addEventListener('click', function (event) {
-    var sparkle = document.createElement('span');
-    sparkle.className = 'sparkle';
-    sparkle.style.left = event.clientX + 'px';
-    sparkle.style.top = event.clientY + 'px';
-    document.body.appendChild(sparkle);
-    window.setTimeout(function () {
-        sparkle.remove();
-    }, 650);
-});
-
-skillButtons.forEach(function (button) {
-    button.addEventListener('click', function () {
-        this.classList.toggle('selected');
-    });
-});
-
-window.addEventListener('scroll', function () {
-    var current = '';
-
-    sections.forEach(function (section) {
-        if (window.scrollY >= section.offsetTop - 140) {
-            current = section.id;
-        }
-    });
-
-    navLinks.forEach(function (link) {
-        link.classList.toggle('active', link.getAttribute('href') === '#' + current);
-    });
-});
+const raw=[['Skittles Original','candy',1.50,'#e92939'],["M&M's Milk Chocolate",'candy',1.50,'#6b3a21'],['Sour Patch Kids','candy',1.50,'#f1c62e'],['Haribo Goldbears','candy',1.50,'#d9252a'],["Reese's Peanut Butter Cups",'candy',1.75,'#f58220'],['Snickers Bar','candy',1.75,'#603813'],['Twix Bar','candy',1.75,'#d9a51e'],['KitKat Bar','candy',1.75,'#e31b23'],['Starburst Original','candy',1.50,'#ef3b48'],['Nerds Rainbow Candy','candy',1.25,'#e8569c'],['Airheads Cherry','candy',1.25,'#e51b2a'],["Lay's Classic Potato Chips",'chips',1.50,'#f6d226'],['Doritos Nacho Cheese','chips',1.75,'#e95e25'],['Cheetos Crunchy','chips',1.75,'#f58220'],['Takis Fuego','chips',1.75,'#702283'],['Pringles Original','chips',1.75,'#d7212b'],['Ruffles Cheddar Sour Cream','chips',1.75,'#2671b9'],['Fritos Original','chips',1.50,'#f4c430'],['SunChips Harvest Cheddar','chips',1.75,'#e5a52b'],['Cheez-It Original','chips',1.50,'#e42313'],['Goldfish Cheddar Crackers','chips',1.50,'#ec8c22'],['Funyuns Onion Rings','chips',1.75,'#f5d640'],['Smartfood White Cheddar Popcorn','chips',1.75,'#202020'],['Wise Onion Rings','chips',1.50,'#60a744','https://i5.peapod.com/c/UI/UIOPG.png'],['Coca-Cola','drinks',1.50,'#e31b23'],['Sprite','drinks',1.50,'#42a62a'],['Fanta Orange','drinks',1.50,'#ef7d00'],['Dr Pepper','drinks',1.50,'#7b1826'],['Pepsi','drinks',1.50,'#0b4da2'],['Mountain Dew','drinks',1.50,'#68a92f'],['Gatorade Cool Blue','drinks',1.75,'#38a9e0'],['Capri Sun Fruit Punch','drinks',1.25,'#3b7dbb'],['Arizona Green Tea','drinks',1.50,'#71b9aa'],['Minute Maid Lemonade','drinks',1.50,'#f5cf27'],['Dasani Water','drinks',1.00,'#1e6eb6'],['Orbit Peppermint Gum','gum',.75,'#268b88'],['Extra Spearmint Gum','gum',.75,'#17885b'],['Trident Original Gum','gum',.75,'#1c75bc'],['Hubba Bubba Original','gum',1.00,'#ef72a9'],['Juicy Fruit Gum','gum',.75,'#f1d62b'],['Doublemint Gum','gum',.75,'#38a966'],['Bubble Yum Original','gum',1.00,'#ea639f'],['Mentos Pure Fresh Gum','gum',1.25,'#248dd2'],['Big League Chew Original','gum',1.25,'#e86ca0']];
+const verifiedImages={'Skittles Original':'https://images.openfoodfacts.org/images/products/489/701/044/8016/front_en.11.400.jpg',"M&M's Milk Chocolate":'https://images.openfoodfacts.org/images/products/500/015/956/1686/front_fr.3.400.jpg',"Reese's Peanut Butter Cups":'https://www.pngplay.com/wp-content/uploads/15/Reeses-Peanut-Butter-Cups-PNG-Photos.png','Twix Bar':'https://pngset.com/images/candy-bars-twix-transparent-png-55110.png'};
+const products=raw.map((p,i)=>({id:i+1,name:p[0],category:p[1],price:p[2],color:p[3],image:`product-images/${i+1}.jpg`}));let active='all',cart={};const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s),money=n=>'$'+n.toFixed(2),placeholder=p=>p.image;
+async function findPhoto(p){if(p.image)return p.image;const brand=p.name.split(' ')[0].replace(/[^a-z0-9'-]/gi,'').toLowerCase();const lookup=async url=>{const data=await fetch(url).then(r=>r.json());return(data.products||[]).find(x=>x.image_front_url||x.image_url)};try{let match=await lookup(`https://world.openfoodfacts.org/api/v2/search?brands_tags=${encodeURIComponent(brand)}&page_size=10&sort_by=unique_scans_n&fields=product_name,image_front_url,image_url`);if(!match)match=await lookup(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(p.name)}&search_simple=1&action=process&json=1&page_size=8&fields=product_name,image_front_url,image_url`);p.image=match&&(match.image_front_url||match.image_url)||placeholder(p)}catch(e){p.image=placeholder(p)}return p.image}
+async function hydratePhotos(shown){for(const p of shown){const img=document.querySelector(`.product-photo[data-id="${p.id}"]`);if(!img)return;const src=await findPhoto(p);if(img.isConnected)img.src=src;await new Promise(resolve=>setTimeout(resolve,180))}}
+function render(){const q=$('#searchInput').value.trim().toLowerCase(),shown=products.filter(p=>(active==='all'||p.category===active)&&p.name.toLowerCase().includes(q));$('#productGrid').innerHTML=shown.map(p=>`<article class="product-card"><div class="product-art"><img class="product-photo loading" data-id="${p.id}" src="${p.image}" alt="${p.name}" loading="eager" onload="this.classList.remove('loading')"></div><div class="product-info"><div><h3>${p.name}</h3><p>${money(p.price)}</p></div><button class="add-button" data-id="${p.id}" aria-label="Add ${p.name}">+</button></div></article>`).join('');$('#resultCount').textContent=`${shown.length} real snack${shown.length===1?'':'s'}`;$('#emptyState').hidden=!!shown.length;$$('.add-button').forEach(b=>b.onclick=()=>add(+b.dataset.id,b))}
+function choose(cat){active=cat;$$('.filter,.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.category===cat));$('#menuTitle').textContent={all:"Today's menu",candy:'Candy aisle',chips:'Chip aisle',drinks:'Drink aisle',gum:'Gum aisle'}[cat];render();$('#menu').scrollIntoView({behavior:'smooth'})}
+function add(id,b){cart[id]=(cart[id]||0)+1;update();b.textContent='✓';b.classList.add('added');setTimeout(()=>{b.textContent='+';b.classList.remove('added')},650);toast(`${products[id-1].name} added!`)}
+function update(){const e=Object.entries(cart).filter(x=>x[1]>0),count=e.reduce((a,x)=>a+x[1],0),total=e.reduce((a,x)=>a+products[x[0]-1].price*x[1],0);$('#cartCount').textContent=count;$('#cartButton').classList.toggle('has-items',count>0);$('#cartEmpty').hidden=count>0;$('#cartFooter').hidden=!count;$('#subtotal').textContent=money(total);$('#cartItems').innerHTML=e.map(([id,q])=>{const p=products[id-1];return `<div class="cart-item"><img class="cart-thumb" src="${p.image||placeholder(p)}" alt=""><div><h3>${p.name}</h3><p>${money(p.price)}</p></div><div class="quantity"><button data-do="-" data-id="${id}">−</button><b>${q}</b><button data-do="+" data-id="${id}">+</button></div></div>`}).join('');$$('.quantity button').forEach(b=>b.onclick=()=>{cart[b.dataset.id]+=b.dataset.do==='+'?1:-1;if(cart[b.dataset.id]<=0)delete cart[b.dataset.id];update()})}
+function openCart(){closeModal();$('#cartDrawer').classList.add('open');$('#overlay').hidden=false;requestAnimationFrame(()=>$('#overlay').classList.add('show'))}function closeCart(){$('#cartDrawer').classList.remove('open');$('#overlay').classList.remove('show');setTimeout(()=>{if(!$('#checkoutModal').classList.contains('open'))$('#overlay').hidden=true},220)}
+function checkout(){const e=Object.entries(cart);if(!e.length)return;closeCart();$('#checkoutSummary').innerHTML=e.map(([id,q])=>`<p><span>${q}× ${products[id-1].name}</span><b>${money(products[id-1].price*q)}</b></p>`).join('');$('#checkoutTotal').textContent=money(e.reduce((a,x)=>a+products[x[0]-1].price*x[1],0));$('#overlay').hidden=false;requestAnimationFrame(()=>$('#overlay').classList.add('show'));$('#checkoutModal').classList.add('open')}
+function closeModal(){$('#checkoutModal').classList.remove('open');if(!$('#cartDrawer').classList.contains('open')){$('#overlay').classList.remove('show');setTimeout(()=>$('#overlay').hidden=true,220)}}
+function swipe(){$('#checkoutStep').hidden=true;$('#paymentAnimation').hidden=false;setTimeout(()=>{const e=Object.entries(cart),total=e.reduce((a,x)=>a+products[x[0]-1].price*x[1],0),num=Math.floor(1000+Math.random()*9000),name=$('#studentName').value.trim()||'Snack Fan';$('#paymentAnimation').hidden=true;$('#receiptWrap').hidden=false;$('#receipt').innerHTML=`<div class="receipt-logo">SHACK SHACK</div><p class="receipt-center">ROOM 214 • ORDER #${num}<br>${new Date().toLocaleString()}</p><div class="receipt-rule"></div><p><span>Student</span><b>${safe(name)}</b></p>${e.map(([id,q])=>`<p><span>${q} × ${products[id-1].name}</span><b>${money(products[id-1].price*q)}</b></p>`).join('')}<div class="receipt-rule"></div><p class="receipt-total"><span>PRETEND TOTAL</span><b>${money(total)}</b></p><p class="receipt-center">PAID — PRETEND CARD<br><br>Pick up at Room 214<br>12:15–12:45 PM<br><br>★ THANKS, SNACK STAR! ★</p>`;cart={};update()},1500)}
+function safe(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}function reset(){closeModal();setTimeout(()=>{$('#checkoutStep').hidden=false;$('#paymentAnimation').hidden=true;$('#receiptWrap').hidden=true;$('#studentName').value=''},250)}let tt;function toast(s){$('#toast').textContent=s;$('#toast').classList.add('show');clearTimeout(tt);tt=setTimeout(()=>$('#toast').classList.remove('show'),1800)}
+$$('.filter,.nav-link').forEach(b=>b.onclick=()=>choose(b.dataset.category));$('#searchInput').oninput=render;$('#shopNow').onclick=()=>$('#menu').scrollIntoView({behavior:'smooth'});$('#cartButton').onclick=openCart;$('#closeCart').onclick=closeCart;$('#checkoutButton').onclick=checkout;$('#closeCheckout').onclick=closeModal;$('#swipeButton').onclick=swipe;$('#doneButton').onclick=reset;$('#overlay').onclick=()=>$('#checkoutModal').classList.contains('open')?closeModal():closeCart();document.onkeydown=e=>{if(e.key==='Escape')$('#checkoutModal').classList.contains('open')?closeModal():closeCart()};$('#year').textContent=new Date().getFullYear();render();update();
