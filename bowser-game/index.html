@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pixel Princess Rescue</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar" aria-label="Game status">
+        <div class="brand">Pixel Princess Rescue</div>
+        <div class="hud">
+          <span>Level <strong id="level">1</strong></span>
+          <span>Time <strong id="time">05:00</strong></span>
+          <span>Hero HP <strong id="playerHp">200</strong></span>
+          <span>Bowser HP <strong id="bossHp">1000</strong></span>
+          <span id="weaponBadge" class="badge">Punch</span>
+        </div>
+      </section>
+
+      <section class="stage-wrap">
+        <canvas id="game" width="960" height="540" aria-label="2D pixel platform game"></canvas>
+        <div id="overlay" class="overlay">
+          <div class="panel">
+            <h1>Save Peach</h1>
+            <p>
+              Reach the castle before the 5 minute timer ends, survive the enemies,
+              defeat Bowser, and carry Peach through three brutal levels.
+            </p>
+            <div class="keys">
+              <span>W double jump</span>
+              <span>A left</span>
+              <span>D right</span>
+              <span>S duck</span>
+              <span>Space punch / fire</span>
+              <span>R restart</span>
+            </div>
+            <button id="startBtn" type="button">Start Game</button>
+            <div class="level-select" aria-label="Choose level">
+              <button type="button" data-level="1">Level 1</button>
+              <button type="button" data-level="2">Level 2</button>
+              <button type="button" data-level="3">Level 3</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="instructions">
+        <p>
+          WASD moves. Tap W twice to double jump. Press Space to punch. When your HP drops below 100, you unlock
+          the AK-47, which deals 150 damage per second while Space is held. Saving Peach opens harder levels.
+        </p>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
